@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Terminal, Send, BookOpen, Code, Folder, GitBranch } from 'lucide-react';
+import Card from './ui/Card'; // Import Card component
 
 interface Command {
   input: string;
@@ -232,12 +233,7 @@ Escribe /help para ver todos los comandos disponibles.`;
       </div>
 
       {/* Referencia de comandos */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <BookOpen className="w-6 h-6 text-blue-400" />
-          <h2 className="text-2xl font-bold text-white">Referencia de Comandos</h2>
-        </div>
-        
+      <Card title="Referencia de Comandos" icon={BookOpen} iconColorClass="text-blue-400">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {availableCommands.map((cmd, index) => (
             <div key={index} className="border border-gray-600 rounded-lg p-4 bg-gray-900/30">
@@ -253,15 +249,10 @@ Escribe /help para ver todos los comandos disponibles.`;
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Flujos de trabajo */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <GitBranch className="w-6 h-6 text-purple-400" />
-          <h2 className="text-2xl font-bold text-white">Flujos de Trabajo Automatizados</h2>
-        </div>
-        
+      <Card title="Flujos de Trabajo Automatizados" icon={GitBranch} iconColorClass="text-purple-400">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <h3 className="font-semibold text-white">Desarrollo de Feature</h3>
@@ -299,7 +290,7 @@ Escribe /help para ver todos los comandos disponibles.`;
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Code2, CheckCircle, AlertCircle, Lightbulb, Copy } from 'lucide-react';
+import { Code2, CheckCircle, Lightbulb, Copy, Check } from 'lucide-react'; // Added Check
+import Card from './ui/Card'; // Import Card component
 
 const CodeAssistant: React.FC = () => {
   const [codeInput, setCodeInput] = useState('');
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [copiedSnippetKey, setCopiedSnippetKey] = useState<string | null>(null); // Added state for copied feedback
 
   const analyzeCode = async () => {
     if (!codeInput.trim()) return;
@@ -70,25 +72,25 @@ const CodeAssistant: React.FC = () => {
     }
   ];
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
+    setCopiedSnippetKey(key);
+    setTimeout(() => {
+      setCopiedSnippetKey(null);
+    }, 2000); // Reset after 2 seconds
   };
 
   return (
     <div className="space-y-8">
       {/* Análisis de código */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <Code2 className="w-6 h-6 text-blue-400" />
-          <h2 className="text-2xl font-bold text-white">Análisis de Código</h2>
-        </div>
-        
+      <Card title="Análisis de Código" icon={Code2} iconColorClass="text-blue-400">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="codeInput" className="block text-sm font-medium text-gray-300 mb-2">
               Pega tu código React/TypeScript
             </label>
             <textarea
+              id="codeInput" // Added id for label association
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value)}
               placeholder="// Pega aquí tu código JSX, TSX o componente React..."
@@ -113,45 +115,39 @@ const CodeAssistant: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
       {/* Snippets de código */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <Lightbulb className="w-6 h-6 text-yellow-400" />
-          <h2 className="text-2xl font-bold text-white">Snippets Útiles</h2>
-        </div>
-        
+      <Card title="Snippets Útiles" icon={Lightbulb} iconColorClass="text-yellow-400">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {codeSnippets.map((snippet, index) => (
-            <div key={index} className="border border-gray-600 rounded-lg p-4 bg-gray-900/30">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-white">{snippet.title}</h3>
-                  <span className="text-sm text-gray-400">{snippet.language}</span>
+          {codeSnippets.map((snippet, index) => {
+            const key = `snippet-${snippet.title}-${index}`; // More unique key
+            return (
+              <div key={key} className="border border-gray-600 rounded-lg p-4 bg-gray-900/30">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-semibold text-white">{snippet.title}</h3>
+                    <span className="text-sm text-gray-400">{snippet.language}</span>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(snippet.code, key)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                    aria-label={`Copiar snippet ${snippet.title}`}
+                  >
+                    {copiedSnippetKey === key ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  </button>
                 </div>
-                <button
-                  onClick={() => copyToClipboard(snippet.code)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
-              <pre className="bg-gray-950 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto border border-gray-800">
+                <pre className="bg-gray-950 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto border border-gray-800">
                 <code>{snippet.code}</code>
               </pre>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
-      </div>
+      </Card>
 
       {/* Mejores práticas */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <CheckCircle className="w-6 h-6 text-green-400" />
-          <h2 className="text-2xl font-bold text-white">Mejores Prácticas Frontend</h2>
-        </div>
-        
+      <Card title="Mejores Prácticas Frontend" icon={CheckCircle} iconColorClass="text-green-400">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <h3 className="font-semibold text-white">React & TypeScript</h3>
@@ -197,7 +193,7 @@ const CodeAssistant: React.FC = () => {
             </ul>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
