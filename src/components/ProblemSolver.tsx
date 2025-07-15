@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Search, CheckCircle, XCircle, Info, Lightbulb } from 'lucide-react';
+import Card from './ui/Card'; // Import Card component
 
 interface Solution {
   type: 'quick' | 'stable' | 'optimal';
@@ -134,18 +135,14 @@ const withClientOnly = (Component) => {
   return (
     <div className="space-y-8">
       {/* Descripción del problema */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <AlertTriangle className="w-6 h-6 text-red-400" />
-          <h2 className="text-2xl font-bold text-white">Diagnóstico de Problemas</h2>
-        </div>
-        
+      <Card title="Diagnóstico de Problemas" icon={AlertTriangle} iconColorClass="text-red-400">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="problemDescription" className="block text-sm font-medium text-gray-300 mb-2">
               Describe el problema que estás experimentando
             </label>
             <textarea
+              id="problemDescription" // Added id for label association
               value={problemDescription}
               onChange={(e) => setProblemDescription(e.target.value)}
               placeholder="Ej: Mi aplicación React muestra contenido diferente en el servidor vs cliente, causando errores de hidratación..."
@@ -162,12 +159,10 @@ const withClientOnly = (Component) => {
             <span>{isAnalyzing ? 'Analizando problema...' : 'Diagnosticar Problema'}</span>
           </button>
         </div>
-      </div>
+      </Card>
 
       {/* Problemas comunes */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">Problemas Comunes Frontend</h2>
-        
+      <Card title="Problemas Comunes Frontend">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {commonProblems.map((problem) => (
             <button
@@ -183,13 +178,11 @@ const withClientOnly = (Component) => {
             </button>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Soluciones */}
       {solutions.length > 0 && (
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-          <h2 className="text-2xl font-bold text-white mb-6">Soluciones Propuestas</h2>
-          
+        <Card title="Soluciones Propuestas">
           <div className="space-y-6">
             {solutions.map((solution, index) => (
               <div key={index} className={`border rounded-lg p-6 ${getSolutionColor(solution.type)}`}>
@@ -220,13 +213,11 @@ const withClientOnly = (Component) => {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Herramientas de debugging */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">Herramientas de Debugging</h2>
-        
+      <Card title="Herramientas de Debugging">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 border border-gray-600 rounded-lg bg-gray-900/30">
             <div className="w-12 h-12 bg-blue-900/50 rounded-lg flex items-center justify-center mx-auto mb-3 border border-blue-700">
@@ -252,7 +243,7 @@ const withClientOnly = (Component) => {
             <p className="text-sm text-gray-300">Captura errores en producción</p>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

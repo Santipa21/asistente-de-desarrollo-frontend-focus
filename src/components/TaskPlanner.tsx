@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, CheckSquare, Clock, User, Tag } from 'lucide-react';
+import { Calendar, Plus, CheckSquare, Tag } from 'lucide-react'; // Removed Clock, User as they are not used
+import Card from './ui/Card'; // Import Card component
 
 interface Task {
   id: string;
@@ -15,6 +16,7 @@ const TaskPlanner: React.FC = () => {
   const [projectIdea, setProjectIdea] = useState('');
   const [generatedTasks, setGeneratedTasks] = useState<Task[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [copiedTaskId, setCopiedTaskId] = useState<string | null>(null); // Added state for copied feedback
 
   const generateTasks = async () => {
     if (!projectIdea.trim()) return;
@@ -107,21 +109,25 @@ ${task.description}
 **Estimación:** 2-4 horas`;
   };
 
+  const handleCopyIssue = (task: Task) => {
+    navigator.clipboard.writeText(generateGitHubIssue(task));
+    setCopiedTaskId(task.id);
+    setTimeout(() => {
+      setCopiedTaskId(null);
+    }, 2000);
+  };
+
   return (
     <div className="space-y-8">
       {/* Generador de tareas */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <Calendar className="w-6 h-6 text-blue-400" />
-          <h2 className="text-2xl font-bold text-white">Generador de Tareas</h2>
-        </div>
-        
+      <Card title="Generador de Tareas" icon={Calendar} iconColorClass="text-blue-400">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="projectIdea" className="block text-sm font-medium text-gray-300 mb-2">
               Describe tu idea o proyecto frontend
             </label>
             <textarea
+              id="projectIdea" // Added id for label association
               value={projectIdea}
               onChange={(e) => setProjectIdea(e.target.value)}
               placeholder="Ej: Crear una landing page para una startup de tecnología con secciones de hero, features, testimonios y contacto..."
@@ -138,16 +144,14 @@ ${task.description}
             <span>{isGenerating ? 'Generando tareas...' : 'Generar Plan de Tareas'}</span>
           </button>
         </div>
-      </div>
+      </Card>
 
       {/* Lista de tareas generadas */}
       {generatedTasks.length > 0 && (
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Plan de Tareas Generado</h2>
-            <span className="text-sm text-gray-400">{generatedTasks.length} tareas</span>
-          </div>
-          
+        <Card
+          title="Plan de Tareas Generado"
+          headerActions={<span className="text-sm text-gray-400">{generatedTasks.length} tareas</span>}
+        >
           <div className="space-y-4">
             {generatedTasks.map((task) => (
               <div key={task.id} className="border border-gray-600 rounded-lg p-4 hover:shadow-lg hover:shadow-gray-900/25 transition-shadow bg-gray-900/30">
@@ -181,25 +185,20 @@ ${task.description}
                   </div>
                   
                   <button
-                    onClick={() => navigator.clipboard.writeText(generateGitHubIssue(task))}
+                    onClick={() => handleCopyIssue(task)}
                     className="text-sm text-blue-400 hover:text-blue-300 font-medium hover:bg-gray-700/50 px-3 py-1 rounded transition-colors"
                   >
-                    Copiar GitHub Issue
+                    {copiedTaskId === task.id ? 'Copiado!' : 'Copiar GitHub Issue'}
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Templates de organización */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <CheckSquare className="w-6 h-6 text-green-400" />
-          <h2 className="text-2xl font-bold text-white">Templates de Organización</h2>
-        </div>
-        
+      <Card title="Templates de Organización" icon={CheckSquare} iconColorClass="text-green-400">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="border border-gray-600 rounded-lg p-4 bg-gray-900/30">
             <h3 className="font-semibold text-white mb-3">Estructura de Carpetas Frontend</h3>
@@ -229,7 +228,7 @@ ${task.description}
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
